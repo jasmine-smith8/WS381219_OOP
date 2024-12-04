@@ -1,8 +1,26 @@
 {
   "version": 2,
-  "dgSpecHash": "/HN5+Y59jNH59cehEhIOnn/7yPQv/3BoRN9g4elsGomtbCAkwO0usAQCtUIwGUv0CPT55gyRkXd96gBeaStGHA==",
+  "dgSpecHash": "35bwqBleJ5D4Op2/AVLN2EkfGQaLHhBwWhmzGWjaZr1S4Rfvad2/rykGfpFgmV3XIX+MXVIgvyVhZJrYq7ZgCQ==",
   "success": true,
   "projectFilePath": "/Users/jasminesmith/WS381219_OOP/WS381219_OOP.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "/Users/jasminesmith/.nuget/packages/epplus/7.5.1/epplus.7.5.1.nupkg.sha512",
+    "/Users/jasminesmith/.nuget/packages/epplus.interfaces/7.5.0/epplus.interfaces.7.5.0.nupkg.sha512",
+    "/Users/jasminesmith/.nuget/packages/epplus.system.drawing/7.5.0/epplus.system.drawing.7.5.0.nupkg.sha512",
+    "/Users/jasminesmith/.nuget/packages/microsoft.extensions.configuration/8.0.0/microsoft.extensions.configuration.8.0.0.nupkg.sha512",
+    "/Users/jasminesmith/.nuget/packages/microsoft.extensions.configuration.abstractions/8.0.0/microsoft.extensions.configuration.abstractions.8.0.0.nupkg.sha512",
+    "/Users/jasminesmith/.nuget/packages/microsoft.extensions.configuration.fileextensions/8.0.1/microsoft.extensions.configuration.fileextensions.8.0.1.nupkg.sha512",
+    "/Users/jasminesmith/.nuget/packages/microsoft.extensions.configuration.json/8.0.1/microsoft.extensions.configuration.json.8.0.1.nupkg.sha512",
+    "/Users/jasminesmith/.nuget/packages/microsoft.extensions.fileproviders.abstractions/8.0.0/microsoft.extensions.fileproviders.abstractions.8.0.0.nupkg.sha512",
+    "/Users/jasminesmith/.nuget/packages/microsoft.extensions.fileproviders.physical/8.0.0/microsoft.extensions.fileproviders.physical.8.0.0.nupkg.sha512",
+    "/Users/jasminesmith/.nuget/packages/microsoft.extensions.filesystemglobbing/8.0.0/microsoft.extensions.filesystemglobbing.8.0.0.nupkg.sha512",
+    "/Users/jasminesmith/.nuget/packages/microsoft.extensions.primitives/8.0.0/microsoft.extensions.primitives.8.0.0.nupkg.sha512",
+    "/Users/jasminesmith/.nuget/packages/microsoft.io.recyclablememorystream/3.0.1/microsoft.io.recyclablememorystream.3.0.1.nupkg.sha512",
+    "/Users/jasminesmith/.nuget/packages/microsoft.win32.systemevents/8.0.0/microsoft.win32.systemevents.8.0.0.nupkg.sha512",
+    "/Users/jasminesmith/.nuget/packages/system.componentmodel.annotations/5.0.0/system.componentmodel.annotations.5.0.0.nupkg.sha512",
+    "/Users/jasminesmith/.nuget/packages/system.drawing.common/8.0.4/system.drawing.common.8.0.4.nupkg.sha512",
+    "/Users/jasminesmith/.nuget/packages/system.security.cryptography.pkcs/8.0.1/system.security.cryptography.pkcs.8.0.1.nupkg.sha512",
+    "/Users/jasminesmith/.nuget/packages/system.text.encoding.codepages/8.0.0/system.text.encoding.codepages.8.0.0.nupkg.sha512"
+  ],
   "logs": []
 }
