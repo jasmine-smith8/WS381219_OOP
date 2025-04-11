@@ -1,11 +1,11 @@
 {
   "version": 3,
   "targets": {
-    "net8.0": {}
+    "net9.0": {}
   },
   "libraries": {},
   "projectFileDependencyGroups": {
-    "net8.0": []
+    "net9.0": []
   },
   "packageFolders": {
     "/Users/jasminesmith/.nuget/packages/": {}
@@ -13,24 +13,25 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/jasminesmith/WS381219_OOP/WS381219_OOP.csproj",
+      "projectUniqueName": "/Users/jasminesmith/projects/repos/WS381219_OOP/WS381219_OOP.csproj",
       "projectName": "WS381219_OOP",
-      "projectPath": "/Users/jasminesmith/WS381219_OOP/WS381219_OOP.csproj",
+      "projectPath": "/Users/jasminesmith/projects/repos/WS381219_OOP/WS381219_OOP.csproj",
       "packagesPath": "/Users/jasminesmith/.nuget/packages/",
-      "outputPath": "/Users/jasminesmith/WS381219_OOP/obj/",
+      "outputPath": "/Users/jasminesmith/projects/repos/WS381219_OOP/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/jasminesmith/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
-        "net8.0"
+        "net9.0"
       ],
       "sources": {
+        "/usr/local/Cellar/dotnet/9.0.3/libexec/library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
-        "net8.0": {
-          "targetAlias": "net8.0",
+        "net9.0": {
+          "targetAlias": "net9.0",
           "projectReferences": {}
         }
       },
@@ -38,11 +39,17 @@
         "warnAsError": [
           "NU1605"
         ]
-      }
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "9.0.100"
     },
     "frameworks": {
-      "net8.0": {
-        "targetAlias": "net8.0",
+      "net9.0": {
+        "targetAlias": "net9.0",
         "imports": [
           "net461",
           "net462",
@@ -59,7 +66,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/Cellar/dotnet/8.0.4/libexec/sdk/8.0.104/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/Cellar/dotnet/9.0.3/libexec/sdk/9.0.104/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
