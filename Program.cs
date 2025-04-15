@@ -17,11 +17,24 @@ namespace WS381219_OOP
             var jobs = new Dictionary<int, List<(int OperationID, string Subdivision, int ProcessingTime)>>();
             // Get all CSV files in the "jobs" directory
             string[] files = Directory.GetFiles("jobs", "*.csv");
-            // Iterate through each file
+            // Output file list
+            Console.WriteLine("Select a job file:");
             foreach (string file in files)
             {
+                Console.WriteLine(file);
+            }
+            // Prompt user to select a file
+            Console.Write("Enter the file name (without extension): ");
+            string fileName = Console.ReadLine() ?? string.Empty;
+            // Check if the file exists
+            string filePath = Path.Combine("jobs", fileName + ".csv");
+            if (!File.Exists(filePath))
+            {
+                Console.WriteLine("File not found.");
+                return jobs;
+            }
                 // Read all lines from the CSV file
-                string[] lines = File.ReadAllLines(file);
+                string[] lines = File.ReadAllLines(filePath);
                 // Skip the header line and process each subsequent line
                 for (int i = 1; i < lines.Length; i++)
                 {
@@ -48,7 +61,6 @@ namespace WS381219_OOP
                         jobs[jobID].Add((OperationID, Subdivision, ProcessingTime));
                     }
                 }
-            }
             // Return the populated dictionary of jobs
             return jobs;
         }
@@ -98,6 +110,15 @@ namespace WS381219_OOP
 
             // Output the result
             Console.WriteLine($"Best job fitness: {bestJob.Fitness}");
+            // Export the schedule to a CSV file
+            var scheduler = new Scheduler();
+            foreach (var task in bestJob.Tasks)
+            {
+                scheduler.ScheduleTask(task);
+            }
+            scheduler.ExportScheduleToCSV("optimized_schedule.csv");
+            // Print the schedule
+            scheduler.PrintSchedule();
         }
     }
 
@@ -154,21 +175,90 @@ namespace WS381219_OOP
     }
 
     // Scheduling class
-    class Scheduler
+    public class Scheduler
     {
-        // Method to schedule tasks based on their start and end times
-        public static void ScheduleTasks(List<Task> tasks)
+        // Schedule maps StartTime to Task
+        public SortedDictionary<Tuple<int, int>, Task> Schedule { get; set; }
+
+        public Scheduler()
         {
-            // Sort tasks by their start time
-            tasks.Sort((x, y) => x.StartTime.CompareTo(y.StartTime));
-            // Output the scheduled tasks
-            foreach (var task in tasks)
+            Schedule = new SortedDictionary<Tuple<int, int>, Task>();
+        }
+
+        // Method to add a task to the schedule
+        public void ScheduleTask(Task task)
+        {
+            if (Schedule.Values.Any(existingTask => existingTask.StartTime == task.StartTime && existingTask.Subdivision == task.Subdivision))
             {
-                Console.WriteLine(task);
+                Console.WriteLine($"Conflict detected: Task with StartTime {task.StartTime} already exists in subdivision {task.Subdivision}.");
+            }
+            else
+            {
+                Schedule[new Tuple<int, int>(task.StartTime, task.OperationID)] = task;
+            }
+        }
+        public void ExportScheduleToCSV(string filePath)
+        {
+            // Check if the schedule is empty
+            if (!Schedule.Any())
+            {
+                Console.WriteLine("The schedule is empty. No data to export.");
+                return;
+            }
+
+            // Get all unique subdivision names (columns)
+            var subdivisions = Schedule.Values.Select(task => task.Subdivision).Distinct().ToList();
+
+            // Determine the time range (rows)
+            int minStartTime = Schedule.Keys.Min(key => key.Item1);
+            int maxStartTime = Schedule.Keys.Max(key => key.Item1);
+
+            // Create a dictionary to map StartTime to a row in the CSV
+            var timeRows = new Dictionary<int, Dictionary<string, string>>();
+
+            // Initialize the rows
+            for (int time = minStartTime; time <= maxStartTime; time++)
+            {
+                timeRows[time] = subdivisions.ToDictionary(subdivision => subdivision, _ => string.Empty);
+            }
+
+            // Populate the rows with task details
+            foreach (var entry in Schedule)
+            {
+                int startTime = entry.Key.Item1;
+                var task = entry.Value;
+
+                // Add the task's details to the corresponding subdivision and start time
+                timeRows[startTime][task.Subdivision] = $"JobID: {task.JobID} OpID: {task.OperationID}";
+            }
+
+            // Write to CSV
+            using (var writer = new StreamWriter(filePath))
+            {
+                // Write the header row
+                writer.WriteLine("StartTime," + string.Join(",", subdivisions));
+
+                // Write each row
+                foreach (var time in timeRows.Keys.OrderBy(t => t))
+                {
+                    var row = new List<string> { time.ToString() }; // Start with the StartTime
+                    row.AddRange(subdivisions.Select(subdivision => timeRows[time][subdivision]));
+                    writer.WriteLine(string.Join(",", row));
+                }
+            }
+
+            Console.WriteLine($"Schedule exported to {filePath}");
+        }
+
+        public void PrintSchedule()
+        {
+            // Print the schedule in a readable format
+            foreach (var entry in Schedule)
+            {
+                Console.WriteLine($"StartTime: {entry.Key}, Task: {entry.Value}");
             }
         }
     }
-
 
     class GAJSS
     {
@@ -203,11 +293,56 @@ namespace WS381219_OOP
                 var jobProgress = new Dictionary<int, int>();
                 var schedule = new List<Task>();
 
+                foreach (var job in jobs)
+                {
+                    int jobID = job.JobID;
+                    int previousTaskEndTime = 0; // Tracks the end time of the previous task in the job
+
+                    foreach (var task in job.Tasks)
+                    {
+                        int machineID = task.OperationID;
+
+                        // Ensure the machine has an entry in the availability dictionary
+                        if (!machineAvailability.ContainsKey(machineID))
+                            machineAvailability[machineID] = 0;
+
+                        // Calculate the earliest start time for the task
+                        int earliestStart = Math.Max(previousTaskEndTime, machineAvailability[machineID]);
+
+                        // Check for conflicts
+                        bool conflictDetected = schedule.Any(existingTask =>
+                            existingTask.Subdivision == task.Subdivision &&
+                            existingTask.StartTime < earliestStart + task.ProcessingTime &&
+                            earliestStart < existingTask.EndTime);
+
+                        if (conflictDetected)
+                        {
+                            // Adjust the start time to resolve the conflict
+                            earliestStart = schedule
+                                .Where(existingTask => existingTask.Subdivision == task.Subdivision)
+                                .Max(existingTask => existingTask.EndTime);
+                        }
+
+                        // Schedule the task
+                        var scheduledTask = new Task(task.JobID, task.OperationID, task.Subdivision, task.ProcessingTime)
+                        {
+                            StartTime = earliestStart
+                        };
+
+                        // Update machine availability and previous task end time
+                        machineAvailability[machineID] = scheduledTask.EndTime;
+                        previousTaskEndTime = scheduledTask.EndTime;
+
+                        // Add the task to the schedule
+                        schedule.Add(scheduledTask);
+                    }
+                }
+
                 bool allDone;
                 do
                 {
                     allDone = true;
-                    foreach (var job in jobs.OrderBy(_ => random.Next())) // randomize job order
+                    foreach (var job in jobs.OrderBy(_ => random.Next())) // Randomize job order
                     {
                         int jobID = job.JobID;
                         if (!jobProgress.ContainsKey(jobID)) jobProgress[jobID] = 0;
@@ -230,8 +365,8 @@ namespace WS381219_OOP
                         {
                             var prevTask = job.Tasks[nextTaskIndex - 1];
                             earliestStart = schedule
-                                .Where(t => t.OperationID == prevTask.OperationID && t.Subdivision == prevTask.Subdivision)
-                                .Select(t => t.EndTime) // Use EndTime to respect job order
+                                .Where(t => t.JobID == prevTask.JobID)
+                                .Select(t => t.EndTime)
                                 .Max();
                         }
 
@@ -239,8 +374,11 @@ namespace WS381219_OOP
                         machineAvailability[machineID] = start + task.ProcessingTime;
 
                         // Add task with calculated start time
-                        schedule.Add(new Task(task.JobID, task.OperationID, task.Subdivision, task.ProcessingTime));
-                        schedule.Last().StartTime = start;
+                        var scheduledTask = new Task(task.JobID, task.OperationID, task.Subdivision, task.ProcessingTime)
+                        {
+                            StartTime = start
+                        };
+                        schedule.Add(scheduledTask);
                         jobProgress[jobID]++;
                     }
                 } while (!allDone);
@@ -275,13 +413,13 @@ namespace WS381219_OOP
                     machineTimes[machineID] = 0;
                 }
                 // Calculate the start and end times for the task
-                int startTime = Math.Max(makespan, machineTimes[machineID]);
+                int startTime = Math.Max(machineTimes[machineID], makespan);
                 // Update the end time based on the processing time
                 int endTime = startTime + processingTime;
                 // Update the makespan to the maximum of the current makespan and the end time
                 makespan = endTime;
                 // Update the machine time for the current machine ID
-                machineTimes[machineID] = endTime;
+                machineTimes[machineID] = startTime + processingTime;
             }
             // Set the fitness of the individual job to the makespan
             individual.Fitness = makespan;
@@ -307,42 +445,58 @@ namespace WS381219_OOP
 
         private Job Crossover(Job parent1, Job parent2)
         {
-            // Perform crossover between two parent jobs to create a child job
+            // Create a child job with the same JobID as the parents
             var child = new Job(parent1.JobID);
-            // Randomly select a crossover point
-            var crossoverPoint = random.Next(1, Math.Min(parent1.Tasks.Count, parent2.Tasks.Count));
-            // Iterate through the tasks of the first parent up to the crossover point
-            for (int i = 0; i < crossoverPoint; i++)
+
+            // Use a HashSet to track tasks already added to the child
+            var addedTasks = new HashSet<(int JobID, int OperationID)>();
+
+            // Add tasks from the first parent in order
+            foreach (var task in parent1.Tasks)
             {
-                // Add the task from the first parent to the child
-                child.AddTask(parent1.Tasks[i]);
+                if (!addedTasks.Contains((task.JobID, task.OperationID)))
+                {
+                    child.AddTask(task);
+                    addedTasks.Add((task.JobID, task.OperationID));
+                }
             }
-            // Iterate through the tasks of the second parent from the crossover point
-            for (int i = crossoverPoint; i < parent2.Tasks.Count; i++)
+
+            // Add tasks from the second parent in order, ensuring no duplicates
+            foreach (var task in parent2.Tasks)
             {
-                // Add the task from the second parent to the child
-                child.AddTask(parent2.Tasks[i]);
+                if (!addedTasks.Contains((task.JobID, task.OperationID)))
+                {
+                    child.AddTask(task);
+                    addedTasks.Add((task.JobID, task.OperationID));
+                }
             }
-            // Calculate fitness for the child job
+
+            // Calculate fitness for the child
             CalculateFitness(child);
+
             // Return the child job
             return child;
         }
 
+
         private void Mutate(Job child)
         {
-            // Randomly select two tasks to swap
+            // Randomly select two tasks to swap within the same job
             int index1 = random.Next(child.Tasks.Count);
             int index2 = random.Next(child.Tasks.Count);
-            // Create a temporary variable to swap the tasks
-            var temp = child.Tasks[index1];
-            // Swap the tasks
-            child.Tasks[index1] = child.Tasks[index2];
-            child.Tasks[index2] = temp;
-            // Recalculate fitness after mutation
-            CalculateFitness(child);
 
-            Console.WriteLine("Mutation occurred.");
+            // Ensure the tasks belong to the same job
+            if (child.Tasks[index1].JobID == child.Tasks[index2].JobID)
+            {
+                // Swap the tasks
+                var temp = child.Tasks[index1];
+                child.Tasks[index1] = child.Tasks[index2];
+                child.Tasks[index2] = temp;
+
+                // Recalculate fitness after mutation
+                CalculateFitness(child);
+                Console.WriteLine("Mutation occurred.");
+            }
         }
 
         public Job Solve()
