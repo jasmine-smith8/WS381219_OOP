@@ -1,13 +1,14 @@
 **What do i need to do?**
 
-> Initialise Population needs to return a board with x axis being subdivision and y axis being time
-> Select job from GUI
-> Find out why schedule doesnt match task constraints
-> Find out how to plot the schedule into a CSV
-> Plug in new values for each of the mutation phases
+> Display total makespan time next to schedule
+> Add colour coding to make schedule more readable
+> Display list of jobs and processing times next to schedule 
 > Write class diagrams with updated classes as I go
 > Look at unit testing
-> Create a document for testing plan
+
+> Select job from GUI
+> Display schedule to GUI
+> Allow user to export to XLSX from GUI
 
 **What is this project?**
 

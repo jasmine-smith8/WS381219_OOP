@@ -13,3 +13,13 @@
 /Users/jasminesmith/projects/repos/WS381219_OOP/obj/Debug/net9.0/WS381219_OOP.pdb
 /Users/jasminesmith/projects/repos/WS381219_OOP/obj/Debug/net9.0/WS381219_OOP.genruntimeconfig.cache
 /Users/jasminesmith/projects/repos/WS381219_OOP/obj/Debug/net9.0/ref/WS381219_OOP.dll
+/Users/jasminesmith/projects/repos/WS381219_OOP/bin/Debug/net9.0/ClosedXML.dll
+/Users/jasminesmith/projects/repos/WS381219_OOP/bin/Debug/net9.0/ClosedXML.Parser.dll
+/Users/jasminesmith/projects/repos/WS381219_OOP/bin/Debug/net9.0/DocumentFormat.OpenXml.dll
+/Users/jasminesmith/projects/repos/WS381219_OOP/bin/Debug/net9.0/DocumentFormat.OpenXml.Framework.dll
+/Users/jasminesmith/projects/repos/WS381219_OOP/bin/Debug/net9.0/ExcelNumberFormat.dll
+/Users/jasminesmith/projects/repos/WS381219_OOP/bin/Debug/net9.0/RBush.dll
+/Users/jasminesmith/projects/repos/WS381219_OOP/bin/Debug/net9.0/SixLabors.Fonts.dll
+/Users/jasminesmith/projects/repos/WS381219_OOP/bin/Debug/net9.0/System.IO.Packaging.dll
+/Users/jasminesmith/projects/repos/WS381219_OOP/obj/Debug/net9.0/WS381219_OOP.csproj.AssemblyReference.cache
+/Users/jasminesmith/projects/repos/WS381219_OOP/obj/Debug/net9.0/WS381219.FA3513C5.Up2Date

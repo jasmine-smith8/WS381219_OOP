@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ClosedXML.Excel;
 // namespace is used to organize code and avoid naming conflicts
 namespace WS381219_OOP
 {
@@ -116,9 +117,10 @@ namespace WS381219_OOP
             {
                 scheduler.ScheduleTask(task);
             }
-            scheduler.ExportScheduleToCSV("optimized_schedule.csv");
+            var schedule = new ScheduleExporter(scheduler);
+            schedule.ExportScheduleToXLSX("optimized_schedule.xlsx");
             // Print the schedule
-            scheduler.PrintSchedule();
+            schedule.PrintSchedule();
         }
     }
 
@@ -146,7 +148,6 @@ namespace WS381219_OOP
         {
             // Add the task to the list of tasks
             Tasks.Add(task);
-            Console.WriteLine($"Task added: {task}");
         }
     }
 
@@ -197,23 +198,34 @@ namespace WS381219_OOP
                 Schedule[new Tuple<int, int>(task.StartTime, task.OperationID)] = task;
             }
         }
-        public void ExportScheduleToCSV(string filePath)
+    }
+
+    public class ScheduleExporter
+    {
+        private readonly Scheduler _scheduler;
+
+        public ScheduleExporter(Scheduler scheduler)
+        {
+            _scheduler = scheduler;
+        }
+
+        public void ExportScheduleToXLSX(string filePath)
         {
             // Check if the schedule is empty
-            if (!Schedule.Any())
+            if (!_scheduler.Schedule.Any())
             {
                 Console.WriteLine("The schedule is empty. No data to export.");
                 return;
             }
 
             // Get all unique subdivision names (columns)
-            var subdivisions = Schedule.Values.Select(task => task.Subdivision).Distinct().ToList();
+            var subdivisions = _scheduler.Schedule.Values.Select(task => task.Subdivision).Distinct().ToList();
 
             // Determine the time range (rows)
-            int minStartTime = Schedule.Keys.Min(key => key.Item1);
-            int maxStartTime = Schedule.Keys.Max(key => key.Item1);
+            int minStartTime = _scheduler.Schedule.Keys.Min(key => key.Item1);
+            int maxStartTime = _scheduler.Schedule.Keys.Max(key => key.Item1);
 
-            // Create a dictionary to map StartTime to a row in the CSV
+            // Create a dictionary to map StartTime to a row in the XLS
             var timeRows = new Dictionary<int, Dictionary<string, string>>();
 
             // Initialize the rows
@@ -223,7 +235,7 @@ namespace WS381219_OOP
             }
 
             // Populate the rows with task details
-            foreach (var entry in Schedule)
+            foreach (var entry in _scheduler.Schedule)
             {
                 int startTime = entry.Key.Item1;
                 var task = entry.Value;
@@ -232,19 +244,35 @@ namespace WS381219_OOP
                 timeRows[startTime][task.Subdivision] = $"JobID: {task.JobID} OpID: {task.OperationID}";
             }
 
-            // Write to CSV
-            using (var writer = new StreamWriter(filePath))
+            // Create an Excel file using library ClosedXML
+            using (var workbook = new ClosedXML.Excel.XLWorkbook())
             {
+                var worksheet = workbook.Worksheets.Add("Schedule");
+
                 // Write the header row
-                writer.WriteLine("StartTime," + string.Join(",", subdivisions));
+                worksheet.Cell(1, 1).Value = "StartTime";
+                for (int i = 0; i < subdivisions.Count; i++)
+                {
+                    worksheet.Cell(1, i + 2).Value = subdivisions[i];
+                }
 
                 // Write each row
+                int rowIndex = 2;
                 foreach (var time in timeRows.Keys.OrderBy(t => t))
                 {
-                    var row = new List<string> { time.ToString() }; // Start with the StartTime
-                    row.AddRange(subdivisions.Select(subdivision => timeRows[time][subdivision]));
-                    writer.WriteLine(string.Join(",", row));
+                    // Convert the time (assumed to be in hours) to a formatted time string starting from 09:00
+                    TimeSpan formattedTime = TimeSpan.FromHours(9) + TimeSpan.FromHours(time);
+                    worksheet.Cell(rowIndex, 1).Value = formattedTime.ToString(@"hh\:mm"); // StartTime in HH:mm format
+
+                    for (int i = 0; i < subdivisions.Count; i++)
+                    {
+                        worksheet.Cell(rowIndex, i + 2).Value = timeRows[time][subdivisions[i]];
+                    }
+                    rowIndex++;
                 }
+
+                // Save the workbook to the specified file path
+                workbook.SaveAs(filePath);
             }
 
             Console.WriteLine($"Schedule exported to {filePath}");
@@ -253,7 +281,7 @@ namespace WS381219_OOP
         public void PrintSchedule()
         {
             // Print the schedule in a readable format
-            foreach (var entry in Schedule)
+            foreach (var entry in _scheduler.Schedule)
             {
                 Console.WriteLine($"StartTime: {entry.Key}, Task: {entry.Value}");
             }
