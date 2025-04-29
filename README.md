@@ -1,14 +1,10 @@
 **What do i need to do?**
 
-* Display total makespan time next to schedule
-* Add colour coding to make schedule more readable
 * Display list of jobs and processing times next to schedule 
+* Improve solution diversity
 * Write class diagrams with updated classes as I go
 * Look at unit testing
-
-* Select job from GUI
-* Display schedule to GUI
-* Allow user to export to XLSX from GUI
+* Write testing document
 
 **What is this project?**
 
