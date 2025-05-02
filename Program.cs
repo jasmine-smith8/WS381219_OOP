@@ -47,19 +47,6 @@ namespace WS381219_OOP
             // Stop the stopwatch
             stopWatch.Stop();
 
-            // Output the optimized schedule
-            Console.WriteLine("Optimized Schedule:");
-            var groupedTasks = bestJob.Tasks.GroupBy(task => task.JobID);
-
-            foreach (var group in groupedTasks)
-            {
-                Console.WriteLine($"Job ID: {group.Key}");
-                foreach (var task in group)
-                {
-                    Console.WriteLine($"  OperationID: {task.OperationID}, Subdivision: {task.Subdivision}, ProcessingTime: {task.ProcessingTime}, StartTime: {task.StartTime}, EndTime: {task.EndTime}");
-                }
-            }
-
             //Output the result
             Console.WriteLine($"Best job fitness: {bestJob.Fitness}");
             // Export the schedule to a CSV file
@@ -69,15 +56,25 @@ namespace WS381219_OOP
                 scheduler.ScheduleTask(task);
             }
             var schedule = new ScheduleExporter(scheduler);
-            // Allow user to name file
-            Console.Write("Enter the name of the output file (without extension): ");
-            var name = Console.ReadLine();
-            // Export the schedule to an XLSX file
-            schedule.ExportScheduleToXLSX($"{name}.xlsx");
             // Print the schedule
             schedule.PrintSchedule();
+            // Ask user if they want to export the schedule
+            Console.Write("Do you want to export the schedule to an XLSX file? (y/n): ");
+            var exportChoice = Console.ReadLine();
+            // If user chooses to export, proceed with export
+            if (exportChoice?.ToLower() == "y")
+            {
+                // Allow user to name file
+                Console.Write("Enter the name of the output file (without extension): ");
+                var name = Console.ReadLine();
+                schedule.ExportScheduleToXLSX($"{name}.xlsx");
+            }
+            else
+            {
+                Console.WriteLine("Schedule not exported.");
+            }
             // Output the elapsed time
-            Console.WriteLine($"Elapsed time: {stopWatch.ElapsedMilliseconds} ms");
+            Console.WriteLine($"Elapsed time: {stopWatch.ElapsedMilliseconds} ms ({stopWatch.Elapsed.TotalSeconds} seconds)");
         }
     }
 }

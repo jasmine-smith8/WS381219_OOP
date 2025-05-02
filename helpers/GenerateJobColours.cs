@@ -4,9 +4,9 @@ namespace WS381219_OOP
     public class JobColourGenerator
     {
         // Helper method to generate a color mapping for Job IDs
-        public Dictionary<int, XLColor> GenerateJobIdColors(Scheduler scheduler)
+        public Dictionary<int, XLColor> GeneratejobIdColours(Scheduler scheduler)
         {
-            var colors = new List<XLColor>
+            var colours = new List<XLColor>
             {
                 XLColor.LightBlue,
                 XLColor.Aquamarine,
@@ -19,17 +19,17 @@ namespace WS381219_OOP
                 XLColor.BabyBlueEyes,
                 XLColor.LightPastelPurple,
             };
-
-            var jobIdColors = new Dictionary<int, XLColor>();
-            int colorIndex = 0;
-
+            // Create a dictionary to store the color mapping for each Job ID
+            var jobIdColours = new Dictionary<int, XLColor>();
+            int colourIndex = 0;
+            // Iterate through the scheduled tasks and assign colors to Job IDs
             foreach (var jobId in scheduler.Schedule.Values.Select(task => task.JobID).Distinct())
             {
-                jobIdColors[jobId] = colors[colorIndex % colors.Count];
-                colorIndex++;
+                jobIdColours[jobId] = colours[colourIndex % colours.Count];
+                colourIndex++;
             }
 
-            return jobIdColors;
+            return jobIdColours;
         }
     }
 }

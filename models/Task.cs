@@ -5,7 +5,7 @@ namespace WS381219_OOP
         // Properties of the Task class
         public int JobID { get; set; }           // ID of the job
         public int OperationID { get; set; }        // ID of the machine
-        public string Subdivision { get; set; }     // Machine name or label
+        public string Subdivision { get; set; }     // Machine name 
         public int ProcessingTime { get; set; }     // Time the task takes
         public int StartTime { get; set; }          // When the task starts
         public int EndTime => StartTime + ProcessingTime; // Calculated automatically
@@ -16,11 +16,6 @@ namespace WS381219_OOP
             OperationID = operationID;
             Subdivision = subdivision;
             ProcessingTime = processingTime;
-        }
-
-        public override string ToString()
-        {
-            return $"[JobID: {JobID}, Subdivision: {Subdivision}] Start: {StartTime}, End: {EndTime}, Duration: {ProcessingTime}";
         }
     }
 }

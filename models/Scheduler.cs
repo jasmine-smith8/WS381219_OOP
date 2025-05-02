@@ -20,12 +20,16 @@ namespace WS381219_OOP
         // Method to add a task to the schedule
         public void ScheduleTask(Task task)
         {
+            // Check if the task is already scheduled in the same subdivision
             if (Schedule.Values.Any(existingTask => existingTask.StartTime == task.StartTime && existingTask.Subdivision == task.Subdivision))
             {
+                // If a conflict is detected, do not add the task and log the conflict
                 Console.WriteLine($"Conflict detected: Task with StartTime {task.StartTime} already exists in subdivision {task.Subdivision}.");
+                return;
             }
             else
             {
+                // If no conflict, add the task to the schedule
                 Schedule[new Tuple<int, int>(task.StartTime, task.OperationID)] = task;
             }
         }
